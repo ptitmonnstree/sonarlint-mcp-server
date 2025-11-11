@@ -10,9 +10,8 @@ A Model Context Protocol (MCP) server that brings enterprise-grade code analysis
 - **🔍 Real-time Code Analysis** - Detect bugs, code smells, and security vulnerabilities
 - **🚀 Fast & Standalone** - No IDE or SonarQube server required
 - **📦 Multiple Languages** - JavaScript, TypeScript, Python (265+ JS rules)
-- **⚡ Smart Caching** - 5-minute TTL for lightning-fast repeat analyses
+- **💾 Session Storage** - Results stored in memory for multi-turn conversations
 - **🔧 Quick Fixes** - Automated suggestions for common issues
-- **💾 Persistent Results** - MCP resources for multi-turn conversations
 - **🎯 Batch Analysis** - Analyze multiple files efficiently
 
 ## Quick Start

@@ -445,7 +445,7 @@ function formatBatchAnalysisResult(result: BatchAnalysisResult): string {
 const tools: Tool[] = [
   {
     name: "analyze_file",
-    description: "Analyze a single file for code quality issues, bugs, and security vulnerabilities using SonarLint rules. Returns detailed issues with line numbers, severity levels, and quick fixes. Results are cached for 5 minutes.",
+    description: "Analyze a single file for code quality issues, bugs, and security vulnerabilities using SonarLint rules. Returns detailed issues with line numbers, severity levels, and quick fixes.",
     inputSchema: {
       type: "object",
       properties: {
@@ -1106,7 +1106,7 @@ async function handleHealthCheck() {
     cache: cacheStats,
     tools: ["analyze_file", "analyze_files", "analyze_content", "list_active_rules", "health_check"],
     features: [
-      "Analysis caching (5-min TTL)",
+      "Session storage for multi-turn conversations",
       "Batch analysis",
       "Content analysis (unsaved files)",
       "MCP resources",
@@ -1518,7 +1518,7 @@ async function main() {
   console.error("[MCP] Mode: Standalone (no IDE required)");
   console.error("[MCP] Tools: analyze_file, analyze_files, analyze_content, list_active_rules");
   console.error("[MCP] Features:");
-  console.error("[MCP]   - Analysis caching (5-minute TTL)");
+  console.error("[MCP]   - Session storage for multi-turn conversations");
   console.error("[MCP]   - Batch analysis for multiple files");
   console.error("[MCP]   - Content analysis (unsaved files)");
   console.error("[MCP]   - MCP resources for persistent results");
