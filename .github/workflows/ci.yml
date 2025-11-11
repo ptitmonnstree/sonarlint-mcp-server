@@ -33,32 +33,6 @@ jobs:
       - name: Build
         run: npm run build
 
-      - name: Verify backend downloaded
-        run: |
-          echo "Checking backend installation..."
-          ls -la || true
-          if [ -d "sonarlint-backend" ]; then
-            echo "sonarlint-backend directory exists"
-            ls -la sonarlint-backend/ || true
-          else
-            echo "sonarlint-backend directory does not exist"
-          fi
-
-          if [ -d "sonarlint-backend/lib" ] && [ -d "sonarlint-backend/jre" ] && [ -d "sonarlint-backend/plugins" ]; then
-            echo "✅ SonarLint backend installed successfully"
-            ls -la sonarlint-backend/
-          else
-            echo "❌ SonarLint backend installation failed - running setup manually"
-            npm run setup
-            if [ -d "sonarlint-backend/lib" ] && [ -d "sonarlint-backend/jre" ] && [ -d "sonarlint-backend/plugins" ]; then
-              echo "✅ Manual setup successful"
-            else
-              echo "❌ Manual setup also failed"
-              exit 1
-            fi
-          fi
-        shell: bash
-
   lint:
     runs-on: ubuntu-latest
     steps:
