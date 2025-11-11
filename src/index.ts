@@ -13,6 +13,12 @@ import { existsSync, statSync, writeFileSync, unlinkSync, readdirSync, readFileS
 import { join, dirname, extname, basename, relative } from "path";
 import { createHash } from "crypto";
 import { tmpdir } from "os";
+import { fileURLToPath } from "url";
+
+// Get package root directory (where sonarlint-backend is installed)
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
+const PACKAGE_ROOT = join(__dirname, '..');  // Go up from dist/ to package root
 
 // Type definitions for better type safety
 interface AnalysisIssue {
@@ -123,7 +129,7 @@ async function ensureSloopBridge(): Promise<SloopBridge> {
     console.error("[MCP] Initializing SLOOP bridge...");
 
     // Check if plugins are downloaded
-    const pluginsDir = join(process.cwd(), "sonarlint-backend", "plugins");
+    const pluginsDir = join(PACKAGE_ROOT, "sonarlint-backend", "plugins");
     if (!existsSync(pluginsDir)) {
       throw new SloopError(
         "Backend not found",
@@ -133,7 +139,7 @@ async function ensureSloopBridge(): Promise<SloopBridge> {
     }
 
     try {
-      sloopBridge = new SloopBridge();
+      sloopBridge = new SloopBridge(PACKAGE_ROOT);
       await sloopBridge.connect();
       console.error("[MCP] SLOOP bridge initialized successfully");
     } catch (error) {

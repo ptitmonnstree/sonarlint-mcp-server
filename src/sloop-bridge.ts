@@ -25,12 +25,11 @@ export class SloopBridge extends EventEmitter {
   private readonly config: Required<Omit<SloopConfig, 'autoInitialize'>> & Pick<SloopConfig, 'autoInitialize'>;
   private readonly projectRoot: string;
 
-  constructor(config: SloopConfig = {}) {
+  constructor(packageRoot?: string, config: SloopConfig = {}) {
     super();
 
-    // Use process.cwd() as project root
-    // This works as long as the process is started from the project directory
-    this.projectRoot = process.cwd();
+    // Use provided package root or fall back to process.cwd()
+    this.projectRoot = packageRoot || process.cwd();
 
     // Default configuration - using local sonarlint-intellij directory
     const cacheDir = join(tmpdir(), 'sonarlint-mcp');
