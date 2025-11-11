@@ -1,11 +1,14 @@
 # Changelog
 
-All notable changes to this project will be documented in this file.
+All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
-The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
-and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
+### [0.1.1](https://github.com/nielspeter/sonarlint-mcp-server/compare/v0.1.0...v0.1.1) (2025-11-11)
 
-## [Unreleased]
+
+### Features
+
+* enable OIDC trusted publishing (token-free CI/CD) ([e9ec8cd](https://github.com/nielspeter/sonarlint-mcp-server/commit/e9ec8cd8699618f80a6a7eaa931d4594e2b7f9da))
+* switch to OIDC trusted publishing (no tokens needed) ([5dc5aab](https://github.com/nielspeter/sonarlint-mcp-server/commit/5dc5aabefcb9f8345e526b5ca36b336b8273dd88))
 
 ## [0.1.0] - 2025-01-11
 
