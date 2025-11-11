@@ -1,0 +1,15 @@
+node_modules/
+dist/
+*.log
+.env
+.DS_Store
+coverage/
+*.tsbuildinfo
+.vscode/
+.idea/
+sonarlint-backend/
+
+# Intermediate test files (use tests/ directory instead)
+test-*.js
+test-*.py
+test-*.ts

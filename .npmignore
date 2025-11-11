@@ -1,0 +1,41 @@
+# Source files (dist/ is included instead)
+src/
+tsconfig.json
+
+# Tests
+tests/
+vitest.config.ts
+coverage/
+
+# Development files
+.vscode/
+.idea/
+*.log
+.DS_Store
+.env
+
+# Git
+.git/
+.gitignore
+
+# Documentation (except README.md)
+docs/
+SETUP.md
+TROUBLESHOOTING.md
+
+# GitHub
+.github/
+
+# Test files
+test-*.js
+test-*.py
+test-*.ts
+
+# Build artifacts
+*.tsbuildinfo
+
+# Backend (downloaded via postinstall)
+sonarlint-backend/
+
+# Node
+node_modules/

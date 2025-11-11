@@ -1,0 +1,81 @@
+name: Publish to npm
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+permissions:
+  contents: write
+  id-token: write
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          registry-url: 'https://registry.npmjs.org'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run tests
+        run: npm test
+
+      - name: Build
+        run: npm run build
+
+      - name: Publish to npm
+        run: npm publish --access public --provenance
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+
+      - name: Extract version from tag
+        id: extract_version
+        run: echo "version=${GITHUB_REF#refs/tags/v}" >> $GITHUB_OUTPUT
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v1
+        with:
+          generate_release_notes: true
+          body: |
+            ## Installation
+
+            ```bash
+            npx @nielspeter/sonarlint-mcp-server
+            ```
+
+            Or install globally:
+
+            ```bash
+            npm install -g @nielspeter/sonarlint-mcp-server
+            ```
+
+            ## Configure Claude Desktop
+
+            ```bash
+            claude mcp add --transport stdio sonarlint -- npx -y @nielspeter/sonarlint-mcp-server
+            ```
+
+            Or manually add to `claude_desktop_config.json`:
+
+            ```json
+            {
+              "mcpServers": {
+                "sonarlint": {
+                  "command": "npx",
+                  "args": ["-y", "@nielspeter/sonarlint-mcp-server"]
+                }
+              }
+            }
+            ```
+
+            See [README.md](https://github.com/nielspeter/sonarlint-mcp-server#readme) for full documentation.
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
