@@ -2,6 +2,18 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.1.2](https://github.com/nielspeter/sonarlint-mcp-server/compare/v0.1.1...v0.1.2) (2025-11-11)
+
+
+### Bug Fixes
+
+* remove false claim about 5-minute TTL caching ([d31ba0a](https://github.com/nielspeter/sonarlint-mcp-server/commit/d31ba0acd2ee201176187c0a028bb570ee30314f))
+* remove flaky backend verification step from CI ([381dee2](https://github.com/nielspeter/sonarlint-mcp-server/commit/381dee287c0f144b1eeb1f761e6c797b4f42a8ed))
+* remove remaining false caching claims from README ([a4beb30](https://github.com/nielspeter/sonarlint-mcp-server/commit/a4beb30046286efb5fcc0ed47197ffa5304abd7d))
+* require Node.js 20+ (vitest 4.x requirement) ([2c2e865](https://github.com/nielspeter/sonarlint-mcp-server/commit/2c2e865b1b122f7f27625e02502fc91f280603a4))
+* update error message for missing backend (remove obsolete script reference) ([96447cb](https://github.com/nielspeter/sonarlint-mcp-server/commit/96447cb0e7f3cbf57430047d5794b53d94b59eca))
+* use package root instead of cwd for backend location ([5156db7](https://github.com/nielspeter/sonarlint-mcp-server/commit/5156db759fa82a06a1def964d083d6d29f0a8925))
+
 ### [0.1.1](https://github.com/nielspeter/sonarlint-mcp-server/compare/v0.1.0...v0.1.1) (2025-11-11)
 
 
