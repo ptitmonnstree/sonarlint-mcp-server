@@ -126,8 +126,8 @@ async function ensureSloopBridge(): Promise<SloopBridge> {
     const pluginsDir = join(process.cwd(), "sonarlint-backend", "plugins");
     if (!existsSync(pluginsDir)) {
       throw new SloopError(
-        "Plugins not found",
-        "SonarLint plugins not found. Please run: ./download-plugins-webstorm.sh",
+        "Backend not found",
+        "SonarLint backend not installed. The postinstall script may have failed. Try reinstalling: npm install -g @nielspeter/sonarlint-mcp-server",
         false
       );
     }
