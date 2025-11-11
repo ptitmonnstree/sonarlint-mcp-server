@@ -597,14 +597,6 @@ export class SloopBridge extends EventEmitter {
     });
   }
 
-  async analyzeFiles(configScopeId: string, filePaths: string[]): Promise<any> {
-    // Returns ForceAnalyzeResponse with UUID
-    return this.sendRequest('analysis/analyzeFileList', {
-      configScopeId: configScopeId,  // Note: different field name than analyzeFilesAndTrack!
-      filesToAnalyze: filePaths.map(path => `file://${path}`)
-    });
-  }
-
   async analyzeFilesAndTrack(configScopeId: string, filePaths: string[]): Promise<any> {
     // Generate a random UUID for this analysis
     const analysisId = 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, (c) => {

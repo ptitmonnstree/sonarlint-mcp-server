@@ -1,18 +1,12 @@
 #!/usr/bin/env node
-import { Server } from "@modelcontextprotocol/sdk/server/index.js";
+import { McpServer, ResourceTemplate } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
-import {
-  CallToolRequestSchema,
-  ListToolsRequestSchema,
-  ListResourcesRequestSchema,
-  ReadResourceRequestSchema,
-  Tool,
-} from "@modelcontextprotocol/sdk/types.js";
+import { Tool } from "@modelcontextprotocol/sdk/types.js";
+import { z } from "zod";
 import { SloopBridge } from "./sloop-bridge.js";
 import { existsSync, statSync, writeFileSync, unlinkSync, readdirSync, readFileSync } from "fs";
 import { join, dirname, extname, basename, relative } from "path";
 import { createHash } from "crypto";
-import { tmpdir } from "os";
 import { fileURLToPath } from "url";
 
 // Get package root directory (where sonarlint-backend is installed)
@@ -110,18 +104,10 @@ const batchResults = new Map<string, BatchAnalysisResult>();
 const serverStartTime = Date.now();
 
 // Initialize the MCP server
-const server = new Server(
-  {
-    name: "sonarlint-mcp-server",
-    version: "1.0.0",
-  },
-  {
-    capabilities: {
-      tools: {},
-      resources: {},
-    },
-  }
-);
+const server = new McpServer({
+  name: "sonarlint-mcp-server",
+  version: "1.0.0",
+});
 
 // Helper: Ensure SLOOP bridge is initialized
 async function ensureSloopBridge(): Promise<SloopBridge> {
@@ -620,16 +606,16 @@ const tools: Tool[] = [
   },
 ];
 
-// Register tools
-server.setRequestHandler(ListToolsRequestSchema, async () => ({
-  tools,
-}));
+// Tool registration is now done via server.registerTool() below
+// The tools array is kept for backward compatibility with resource handlers
 
-// Register MCP resources
-server.setRequestHandler(ListResourcesRequestSchema, async () => {
+// Register MCP resources using registerResource()
+// Note: With McpServer, we need to register resources individually or use ResourceTemplate
+
+// Helper function to get all session resources dynamically
+function getSessionResources(): Array<{ uri: string; name: string; description: string; mimeType: string }> {
   const resources = [];
 
-  // Add session analysis results as resources
   for (const [filePath, result] of sessionResults) {
     const resourceId = `analysis-${createHash('md5').update(filePath).digest('hex').substring(0, 8)}`;
     resources.push({
@@ -640,7 +626,6 @@ server.setRequestHandler(ListResourcesRequestSchema, async () => {
     });
   }
 
-  // Add batch results
   for (const [batchId, result] of batchResults) {
     resources.push({
       uri: `sonarlint://batch/${batchId}`,
@@ -650,47 +635,69 @@ server.setRequestHandler(ListResourcesRequestSchema, async () => {
     });
   }
 
-  return { resources };
-});
+  return resources;
+}
 
-server.setRequestHandler(ReadResourceRequestSchema, async (request) => {
-  const uri = request.params.uri;
-
-  if (uri.startsWith('sonarlint://session/')) {
-    const resourceId = uri.replace('sonarlint://session/', '');
-
+// Register a dynamic resource template for session results
+server.registerResource(
+  'session-analysis',
+  new ResourceTemplate('sonarlint://session/{resourceId}', {
+    list: () => ({
+      resources: getSessionResources().filter(r => r.uri.startsWith('sonarlint://session/'))
+    })
+  }),
+  {
+    title: 'SonarLint Session Analysis',
+    description: 'Analysis results from the current session',
+    mimeType: 'application/json'
+  },
+  async (uri, { resourceId }) => {
     // Find matching result
     for (const [filePath, result] of sessionResults) {
       const fileResourceId = createHash('md5').update(filePath).digest('hex').substring(0, 8);
-      if (fileResourceId === resourceId) {
+      if (fileResourceId === String(resourceId)) {
         return {
           contents: [{
-            uri,
-            mimeType: "application/json",
+            uri: uri.href,
+            mimeType: "application/json" as const,
             text: JSON.stringify(result, null, 2),
           }],
         };
       }
     }
+    throw new Error(`Session resource not found: ${resourceId}`);
   }
+);
 
-  if (uri.startsWith('sonarlint://batch/')) {
-    const batchId = uri.replace('sonarlint://batch/', '');
-    const result = batchResults.get(batchId);
+// Register a dynamic resource template for batch results
+server.registerResource(
+  'batch-analysis',
+  new ResourceTemplate('sonarlint://batch/{batchId}', {
+    list: () => ({
+      resources: getSessionResources().filter(r => r.uri.startsWith('sonarlint://batch/'))
+    })
+  }),
+  {
+    title: 'SonarLint Batch Analysis',
+    description: 'Batch analysis results',
+    mimeType: 'application/json'
+  },
+  async (uri, { batchId }) => {
+    const result = batchResults.get(String(batchId));
 
     if (result) {
       return {
         contents: [{
-          uri,
-          mimeType: "application/json",
+          uri: uri.href,
+          mimeType: "application/json" as const,
           text: JSON.stringify(result, null, 2),
         }],
       };
     }
-  }
 
-  throw new Error(`Resource not found: ${uri}`);
-});
+    throw new Error(`Batch resource not found: ${batchId}`);
+  }
+);
 
 // Tool handler functions (extracted to reduce cognitive complexity)
 async function handleAnalyzeFile(args: any) {
@@ -773,7 +780,7 @@ async function handleAnalyzeFile(args: any) {
   return {
     content: [
       {
-        type: "text",
+        type: "text" as const,
         text: formattedResult,
       },
     ],
@@ -781,7 +788,7 @@ async function handleAnalyzeFile(args: any) {
 }
 
 async function handleAnalyzeFiles(args: any) {
-  const { filePaths, groupByFile = true, minSeverity, excludeRules } = args as {
+  const { filePaths, minSeverity, excludeRules } = args as {
     filePaths: string[];
     groupByFile?: boolean;
     minSeverity?: string;
@@ -912,7 +919,7 @@ async function handleAnalyzeFiles(args: any) {
   return {
     content: [
       {
-        type: "text",
+        type: "text" as const,
         text: formattedResult,
       },
     ],
@@ -989,7 +996,7 @@ async function handleAnalyzeContent(args: any) {
     return {
       content: [
         {
-          type: "text",
+          type: "text" as const,
           text: `${formattedResult}\n\n---\n*Note: Analyzed unsaved content*`,
         },
       ],
@@ -1053,7 +1060,7 @@ async function handleListActiveRules(args: any) {
   return {
     content: [
       {
-        type: "text",
+        type: "text" as const,
         text: output,
       },
     ],
@@ -1174,7 +1181,7 @@ async function handleHealthCheck() {
   return {
     content: [
       {
-        type: "text",
+        type: "text" as const,
         text: output,
       },
     ],
@@ -1271,7 +1278,7 @@ async function handleAnalyzeProject(args: any) {
     return {
       content: [
         {
-          type: "text",
+          type: "text" as const,
           text: `No source files found in ${projectPath}.\n\nSupported extensions: ${supportedExtensions.join(', ')}`,
         },
       ],
@@ -1308,7 +1315,7 @@ ${resultText}
   return {
     content: [
       {
-        type: "text",
+        type: "text" as const,
         text: projectSummary,
       },
     ],
@@ -1444,7 +1451,7 @@ async function handleApplyQuickFix(args: any) {
   return {
     content: [
       {
-        type: "text",
+        type: "text" as const,
         text: `✅ **Quick fix applied successfully**\n\nFile: ${filePath}\nLine: ${line}\nRule: ${rule}\nFix: ${quickFix.message || 'Applied automated fix'}\n\nThe file has been modified. You may want to re-analyze it to confirm the issue is resolved.`,
       },
     ],
@@ -1488,7 +1495,7 @@ async function handleApplyAllQuickFixes(args: any) {
     return {
       content: [
         {
-          type: "text",
+          type: "text" as const,
           text: `ℹ️ **No quick fixes available**\n\nFile: ${filePath}\nTotal issues: ${rawIssues.length}\n\nNone of the issues in this file have automated quick fixes available. All issues must be fixed manually.`,
         },
       ],
@@ -1630,78 +1637,189 @@ async function handleApplyAllQuickFixes(args: any) {
   return {
     content: [
       {
-        type: "text",
+        type: "text" as const,
         text: summary,
       },
     ],
   };
 }
 
-// Handle tool calls
-server.setRequestHandler(CallToolRequestSchema, async (request) => {
-  const { name, arguments: args } = request.params;
-
-  try {
-    switch (name) {
-      case "analyze_file":
-        return await handleAnalyzeFile(args);
-
-      case "analyze_files":
-        return await handleAnalyzeFiles(args);
-
-      case "analyze_content":
-        return await handleAnalyzeContent(args);
-
-      case "list_active_rules":
-        return await handleListActiveRules(args);
-
-      case "health_check":
-        return await handleHealthCheck();
-
-      case "analyze_project":
-        return await handleAnalyzeProject(args);
-
-      case "apply_quick_fix":
-        return await handleApplyQuickFix(args);
-
-      case "apply_all_quick_fixes":
-        return await handleApplyAllQuickFixes(args);
-
-      default:
-        throw new SloopError(
-          `Unknown tool: ${name}`,
-          `The tool '${name}' is not recognized. Available tools: analyze_file, analyze_files, analyze_content, list_active_rules, health_check, analyze_project, apply_quick_fix, apply_all_quick_fixes`,
-          false
-        );
+// Register tools with McpServer.registerTool()
+server.registerTool(
+  'analyze_file',
+  {
+    description: "Analyze a single file for code quality issues, bugs, and security vulnerabilities using SonarLint rules. Returns detailed issues with line numbers, severity levels, and quick fixes.",
+    inputSchema: {
+      filePath: z.string().describe("Absolute path to the file to analyze (e.g., /path/to/file.js)"),
+      minSeverity: z.enum(["INFO", "MINOR", "MAJOR", "CRITICAL", "BLOCKER"]).optional().describe("Minimum severity level to include. Filters out issues below this level. Default: INFO (show all)"),
+      excludeRules: z.array(z.string()).optional().describe("List of rule IDs to exclude (e.g., ['typescript:S1135', 'javascript:S125'])"),
+    },
+  },
+  async (args) => {
+    try {
+      return await handleAnalyzeFile(args);
+    } catch (error) {
+      return handleToolError(error);
     }
-  } catch (error) {
-    console.error("[MCP] Error handling tool call:", error);
+  }
+);
 
-    if (error instanceof SloopError) {
-      return {
-        content: [
-          {
-            type: "text",
-            text: `❌ **Error**: ${error.userMessage}`,
-          },
-        ],
-        isError: true,
-      };
+server.registerTool(
+  'analyze_files',
+  {
+    description: "Analyze multiple files in batch for better performance. Returns issues grouped by file with an overall summary. Ideal for analyzing entire directories or project-wide scans.",
+    inputSchema: {
+      filePaths: z.array(z.string()).describe("Array of absolute file paths to analyze"),
+      groupByFile: z.boolean().optional().default(true).describe("Group issues by file in output (default: true)"),
+      minSeverity: z.enum(["INFO", "MINOR", "MAJOR", "CRITICAL", "BLOCKER"]).optional().describe("Minimum severity level to include. Filters out issues below this level. Default: INFO (show all)"),
+      excludeRules: z.array(z.string()).optional().describe("List of rule IDs to exclude (e.g., ['typescript:S1135', 'javascript:S125'])"),
+    },
+  },
+  async (args) => {
+    try {
+      return await handleAnalyzeFiles(args);
+    } catch (error) {
+      return handleToolError(error);
     }
+  }
+);
 
-    const errorMessage = error instanceof Error ? error.message : String(error);
+server.registerTool(
+  'analyze_content',
+  {
+    description: "Analyze code content without requiring a saved file. Useful for analyzing unsaved changes, code snippets, or generated code. Creates a temporary file for analysis.",
+    inputSchema: {
+      content: z.string().describe("The code content to analyze"),
+      language: z.enum(["javascript", "typescript", "python", "java", "go", "php", "ruby"]).describe("Programming language of the content"),
+      fileName: z.string().optional().describe("Optional filename for context (e.g., 'MyComponent.tsx')"),
+    },
+  },
+  async (args) => {
+    try {
+      return await handleAnalyzeContent(args);
+    } catch (error) {
+      return handleToolError(error);
+    }
+  }
+);
 
+server.registerTool(
+  'list_active_rules',
+  {
+    description: "List all active SonarLint rules, optionally filtered by language. Shows which rules are being used to analyze code.",
+    inputSchema: {
+      language: z.enum(["javascript", "typescript", "python", "java", "go", "php", "ruby"]).optional().describe("Filter rules by language (optional)"),
+    },
+  },
+  async (args) => {
+    try {
+      return await handleListActiveRules(args);
+    } catch (error) {
+      return handleToolError(error);
+    }
+  }
+);
+
+server.registerTool(
+  'health_check',
+  {
+    description: "Check the health and status of the SonarLint MCP server. Returns backend status, plugin information, cache statistics, and performance metrics.",
+    inputSchema: {},
+  },
+  async () => {
+    try {
+      return await handleHealthCheck();
+    } catch (error) {
+      return handleToolError(error);
+    }
+  }
+);
+
+server.registerTool(
+  'analyze_project',
+  {
+    description: "Scan an entire project directory for code quality issues. Recursively finds all supported source files and analyzes them in batch. Excludes common non-source directories (node_modules, dist, build, etc.).",
+    inputSchema: {
+      projectPath: z.string().describe("Absolute path to the project directory to scan"),
+      maxFiles: z.number().optional().default(100).describe("Maximum number of files to analyze (default: 100, prevents overwhelming output)"),
+      minSeverity: z.enum(["INFO", "MINOR", "MAJOR", "CRITICAL", "BLOCKER"]).optional().describe("Minimum severity level to include. Filters out issues below this level. Default: INFO (show all)"),
+      excludeRules: z.array(z.string()).optional().describe("List of rule IDs to exclude (e.g., ['typescript:S1135', 'javascript:S125'])"),
+      includePatterns: z.array(z.string()).optional().describe("File glob patterns to include (e.g., ['src/**/*.ts', 'lib/**/*.js']). Default: all supported extensions"),
+    },
+  },
+  async (args) => {
+    try {
+      return await handleAnalyzeProject(args);
+    } catch (error) {
+      return handleToolError(error);
+    }
+  }
+);
+
+server.registerTool(
+  'apply_quick_fix',
+  {
+    description: "Apply a quick fix for ONE SPECIFIC ISSUE at a time. Fixes only the single issue identified by filePath + line + rule. To fix multiple issues, call this tool multiple times (once per issue). The file is modified directly.",
+    inputSchema: {
+      filePath: z.string().describe("Absolute path to the file to fix"),
+      line: z.number().describe("Line number of the issue"),
+      rule: z.string().describe("Rule ID (e.g., 'javascript:S3504')"),
+    },
+  },
+  async (args) => {
+    try {
+      return await handleApplyQuickFix(args);
+    } catch (error) {
+      return handleToolError(error);
+    }
+  }
+);
+
+server.registerTool(
+  'apply_all_quick_fixes',
+  {
+    description: "Apply ALL available quick fixes for a file in one operation. Automatically identifies and fixes all issues that have SonarLint quick fixes available. More efficient than calling apply_quick_fix multiple times. Returns summary of what was fixed and what issues remain (issues without quick fixes must be fixed manually).",
+    inputSchema: {
+      filePath: z.string().describe("Absolute path to the file to fix"),
+    },
+  },
+  async (args) => {
+    try {
+      return await handleApplyAllQuickFixes(args);
+    } catch (error) {
+      return handleToolError(error);
+    }
+  }
+);
+
+// Helper function for error handling
+function handleToolError(error: unknown) {
+  console.error("[MCP] Error handling tool call:", error);
+
+  if (error instanceof SloopError) {
     return {
       content: [
         {
-          type: "text",
-          text: `❌ **Error**: ${errorMessage}`,
+          type: "text" as const,
+          text: `❌ **Error**: ${error.userMessage}`,
         },
       ],
       isError: true,
     };
   }
-});
+
+  const errorMessage = error instanceof Error ? error.message : String(error);
+
+  return {
+    content: [
+      {
+        type: "text" as const,
+        text: `❌ **Error**: ${errorMessage}`,
+      },
+    ],
+    isError: true,
+  };
+}
 
 // Graceful shutdown
 async function shutdown() {
