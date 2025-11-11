@@ -22,7 +22,7 @@ jobs:
           node-version: '20'
           registry-url: 'https://registry.npmjs.org'
 
-      - name: Update npm
+      - name: Update npm to latest
         run: npm install -g npm@latest
 
       - name: Install dependencies
@@ -34,7 +34,7 @@ jobs:
       - name: Build
         run: npm run build
 
-      - name: Publish to npm
+      - name: Publish to npm (OIDC)
         run: npm publish
 
       - name: Extract version from tag
