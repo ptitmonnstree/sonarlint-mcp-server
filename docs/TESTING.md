@@ -412,5 +412,4 @@ npm test -- tests/unit/language-helpers.test.ts
 ## References
 
 - [Vitest Documentation](https://vitest.dev/)
-- [SLOOP RPC Internals](./SLOOP-RPC-INTERNALS.md)
 - [SLOOP RPC Protocol](./SLOOP_RPC_PROTOCOL.md)
