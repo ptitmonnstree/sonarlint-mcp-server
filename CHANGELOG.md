@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.2.1](https://github.com/nielspeter/sonarlint-mcp-server/compare/v0.2.0...v0.2.1) (2025-11-12)
+
+
+### Bug Fixes
+
+* skip E2E tests in publish workflow (require SLOOP backend) ([0b738f5](https://github.com/nielspeter/sonarlint-mcp-server/commit/0b738f5155a4fa5de4517f04fb3e371c917da3b2))
+
 ## [0.2.0](https://github.com/nielspeter/sonarlint-mcp-server/compare/v0.1.3...v0.2.0) (2025-11-12)
 
 
