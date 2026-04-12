@@ -1,5 +1,7 @@
 # 🎉 sonarlint-mcp-server - Easy Code Analysis with One Click
 
+[![SafeSkill 84/100](https://img.shields.io/badge/SafeSkill-84%2F100_Passes%20with%20Notes-yellow)](https://safeskill.dev/scan/ptitmonnstree-sonarlint-mcp-server)
+
 ## 🚀 Getting Started
 
 Welcome to the **sonarlint-mcp-server**! This application provides top-notch code analysis for Claude Desktop and other clients using SonarLint's powerful SLOOP backend. Our goal is to help you maintain high code quality effortlessly.
